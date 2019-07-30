@@ -64,6 +64,15 @@ export class AuthService {
   private guardarToken(idToken: string){
     this.userToken = idToken;
     localStorage.setItem('token', idToken);
+
+    let hoy = new Date();
+
+    //Lo que expira el token de firebase
+    hoy.setSeconds(3600); // 1 hora
+
+    //Se obtiene cuando expira el toquen y se convierte en string ya que no admite enteros.
+    localStorage.setItem('expira', hoy.getTime().toString());
+
   }
 
   leerToken(){
@@ -78,8 +87,20 @@ export class AuthService {
 
   estaAutenticado(): boolean {
 
-    return this.userToken.length > 2;
+    if ( this.userToken.length < 2 ) {
+      return false;
+    }
 
+    //Retorna un string pero se convierte en Numero con Number().
+    const expira = Number(localStorage.getItem('expira'));
+
+    const expiraDate = new Date();
+    expiraDate.setTime(expira);
+
+    if( expiraDate > new Date()) {
+      return true;
+    } else {
+      return false;
+    }
   }
-
 }
